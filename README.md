@@ -2,7 +2,7 @@
 
 A production-ready MERN stack fintech dashboard with JWT authentication, OAuth login, role-based access control, multi-currency wallets, and comprehensive transaction management.
 
-![Nexpay Dashboard](https://img.shields.io/badge/Status-Live-brightgreen) ![License](https://img.shields.io/badge/License-MIT-blue) ![Node](https://img.shields.io/badge/Node.js-18+-green) ![React](https://img.shields.io/badge/React-18-blue)
+![Nexpay Dashboard](https://img.shields.io/badge/Status-Live-brightgreen) 
 
 ## 🏗 Architecture
 
