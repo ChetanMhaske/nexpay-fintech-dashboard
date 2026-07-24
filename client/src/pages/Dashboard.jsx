@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Activity, CreditCard, PieChart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { walletService, transactionService } from '../services/api';
@@ -10,16 +10,7 @@ import TransactionModal from '../components/TransactionModal';
 import Spinner from '../components/Spinner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const mockChartData = [
-  { name: 'Mon', value: 4000 },
-  { name: 'Tue', value: 3000 },
-  { name: 'Wed', value: 5000 },
-  { name: 'Thu', value: 2780 },
-  { name: 'Fri', value: 8900 },
-  { name: 'Sat', value: 2390 },
-  { name: 'Sun', value: 3490 },
-];
-
+// mockRates could also be fetched from API later
 const mockRates = { BTC: 43250.00, ETH: 2280.00, USD: 1 };
 
 const Dashboard = () => {
@@ -34,7 +25,7 @@ const Dashboard = () => {
       setLoading(true);
       const [walletsRes, txRes] = await Promise.all([
         walletService.getWallets().catch(() => ({ data: [] })),
-        transactionService.getTransactions({ limit: 10 }).catch(() => ({ data: { transactions: [] } }))
+        transactionService.getTransactions({ limit: 50 }).catch(() => ({ data: { transactions: [] } }))
       ]);
       const walletsData = walletsRes.data || walletsRes || [];
       const walletsArray = Array.isArray(walletsData) ? walletsData : (walletsData.wallets || []);
@@ -51,6 +42,32 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const chartData = useMemo(() => {
+    const data = [];
+    const today = new Date();
+    // Generate the last 7 days (including today)
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      data.push({
+        name: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        dateString: d.toDateString(),
+        value: 0
+      });
+    }
+
+    // Aggregate transactions by date
+    transactions.forEach(tx => {
+      const txDate = new Date(tx.createdAt).toDateString();
+      const dayData = data.find(d => d.dateString === txDate);
+      if (dayData) {
+        dayData.value += tx.amount * (mockRates[tx.currency] || 1);
+      }
+    });
+
+    return data;
+  }, [transactions]);
 
   const totalVolume = transactions.reduce((acc, curr) => acc + (curr.amount * (mockRates[curr.currency] || 1)), 0);
   const pendingCount = transactions.filter(t => t.status === 'pending').length;
@@ -101,13 +118,14 @@ const Dashboard = () => {
           </div>
           <div className="p-6 flex-1 h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockChartData}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                 <XAxis dataKey="name" stroke="#94a3b8" axisLine={false} tickLine={false} />
-                <YAxis stroke="#94a3b8" axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} />
+                <YAxis stroke="#94a3b8" axisLine={false} tickLine={false} tickFormatter={(val) => `$${val > 1000 ? (val/1000).toFixed(1) + 'k' : val}`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc', borderRadius: '0.5rem' }} 
                   itemStyle={{ color: '#3b82f6' }}
+                  formatter={(value) => [new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value), 'Volume']}
                 />
                 <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
@@ -127,7 +145,7 @@ const Dashboard = () => {
         <div className="p-6 border-b border-dark-800 flex justify-between items-center">
           <h3 className="font-semibold text-white">Recent Transactions</h3>
         </div>
-        <TransactionTable transactions={transactions} />
+        <TransactionTable transactions={transactions.slice(0, 10)} />
       </div>
 
       <TransactionModal 
