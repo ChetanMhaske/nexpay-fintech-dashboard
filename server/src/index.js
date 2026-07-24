@@ -18,6 +18,7 @@ import auditRoutes from './routes/audit.routes.js';
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Database Connection
 connectDB();
@@ -46,7 +47,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error',
-    error: process.env.NODE_ENV === 'development' ? err : {},
+    error: process.env.NODE_ENV !== 'production' ? err : {},
   });
 });
 
