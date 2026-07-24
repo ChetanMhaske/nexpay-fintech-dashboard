@@ -44,3 +44,14 @@ End-to-end API tests on the live Render deployment (`https://nexpay-api-11oo.onr
 
 ### 3. Error Handler Leaking Stack Traces (Edge Case)
 - **Fix Applied:** Updated the error handler in `src/index.js` to use a strict `process.env.NODE_ENV !== 'production'` fallback, ensuring stack traces are never exposed if the environment variable goes missing.
+
+## ✅ Enhancements Added
+
+### 1. 409 Conflict Handling
+- Catching `WriteConflict` and `TransientTransactionError` now strictly returns a `409 Conflict` HTTP status with a clear message for the client to retry.
+
+### 2. Idempotency Keys
+- Transactions accept `Idempotency-Key` headers (tracked in MongoDB) to safely deduplicate API requests that submit exactly the same payload within 5 minutes.
+
+### 3. Frontend UX Resilience
+- The UI correctly auto-generates idempotency keys per transfer attempt. It disables the submit button during inflight requests and shows a global `Waking up server...` toast overlay if Render is performing a cold start.
