@@ -1,5 +1,7 @@
 # 💳 Nexpay — Fintech Transaction Dashboard
 
+Visit: https://nexpay-fintech-dashboard.vercel.app/login
+
 A production-ready MERN stack fintech dashboard with JWT authentication, OAuth login, role-based access control, multi-currency wallets, and comprehensive transaction management.
 
 ![Nexpay Dashboard](https://img.shields.io/badge/Status-Live-brightgreen) 
@@ -200,6 +202,3 @@ The frontend runs on `http://localhost:5173` and the backend on `http://localhos
 | Security | Helmet, CORS, express-rate-limit |
 | Deployment | Vercel (frontend), Render (backend), MongoDB Atlas |
 
-## 📄 License
-
-MIT License — see [LICENSE](./LICENSE) for details.
