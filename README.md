@@ -173,7 +173,7 @@ The frontend runs on `http://localhost:5173` and the backend on `http://localhos
 
 ### MongoDB Atlas
 1. Go to [MongoDB Atlas](https://cloud.mongodb.com)
-2. Create a free M0 cluster
+2. Create a free M0 cluster. **Note: Multi-document transactions require a MongoDB Replica Set.** All Atlas clusters (including M0 Free Tier) are replica sets by default and fully support this feature.
 3. Create a database user and whitelist `0.0.0.0/0`
 4. Copy the connection string to `MONGO_URI`
 

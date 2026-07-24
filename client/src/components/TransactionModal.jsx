@@ -24,7 +24,10 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
         payload.recipientEmail = recipientEmail;
       }
       
-      await transactionService.createTransaction(payload);
+      const idempotencyKey = crypto.randomUUID();
+      await transactionService.createTransaction(payload, { 
+        headers: { 'Idempotency-Key': idempotencyKey } 
+      });
       onSuccess();
       onClose();
       // Reset form

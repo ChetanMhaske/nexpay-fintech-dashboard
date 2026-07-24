@@ -5,17 +5,49 @@ const api = axios.create({
   withCredentials: true,
 });
 
+let activeRequests = 0;
+let wakeupTimer = null;
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  activeRequests++;
+  if (activeRequests === 1) {
+    wakeupTimer = setTimeout(() => {
+      let overlay = document.getElementById('wakeup-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'wakeup-overlay';
+        overlay.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:sans-serif;"><div style="width:40px;height:40px;border:4px solid transparent;border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;"></div><style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style><h2 style="font-size:1.5rem;font-weight:bold;margin:0;">Waking up server...</h2><p style="color:#9ca3af;margin-top:8px;">Render free-tier cold start (takes ~50s)</p></div>';
+        document.body.appendChild(overlay);
+      }
+      overlay.style.display = 'flex';
+    }, 5000);
+  }
+  
   return config;
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    activeRequests--;
+    if (activeRequests === 0) {
+      clearTimeout(wakeupTimer);
+      const overlay = document.getElementById('wakeup-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+    return response;
+  },
   async (error) => {
+    activeRequests--;
+    if (activeRequests === 0) {
+      clearTimeout(wakeupTimer);
+      const overlay = document.getElementById('wakeup-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -50,7 +82,7 @@ export const walletService = {
 };
 
 export const transactionService = {
-  createTransaction: (data) => api.post('/transactions', data).then(res => res.data),
+  createTransaction: (data, config) => api.post('/transactions', data, config).then(res => res.data),
   getTransactions: (params) => api.get('/transactions', { params }).then(res => res.data),
   getTransaction: (id) => api.get(`/transactions/${id}`).then(res => res.data),
 };

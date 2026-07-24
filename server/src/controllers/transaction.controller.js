@@ -2,12 +2,35 @@ import mongoose from 'mongoose';
 import Transaction from '../models/Transaction.js';
 import Wallet from '../models/Wallet.js';
 import User from '../models/User.js';
+import IdempotencyKey from '../models/IdempotencyKey.js';
 import { createAuditLog } from '../utils/helpers.js';
 
 const BTC_TO_USD = 43250.00;
 const ETH_TO_USD = 2280.00;
 
 export const createTransaction = async (req, res) => {
+  const idempotencyKey = req.headers['idempotency-key'] || req.body.idempotencyKey;
+  
+  if (idempotencyKey) {
+    try {
+      const existingKey = await IdempotencyKey.findOne({ key: idempotencyKey });
+      if (existingKey) {
+        if (existingKey.responseBody) {
+          return res.status(existingKey.statusCode || 200).json(existingKey.responseBody);
+        } else {
+          return res.status(409).json({ success: false, message: 'Request already in progress. Please try again.' });
+        }
+      }
+      await IdempotencyKey.create({ key: idempotencyKey });
+    } catch (err) {
+      if (err.code === 11000) {
+         const existingKey = await IdempotencyKey.findOne({ key: idempotencyKey });
+         if (existingKey && existingKey.responseBody) return res.status(existingKey.statusCode).json(existingKey.responseBody);
+         return res.status(409).json({ success: false, message: 'Request already in progress. Please try again.' });
+      }
+    }
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -163,14 +186,27 @@ export const createTransaction = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
-    res.status(201).json({ success: true, data: transaction, message: 'Transaction created successfully' });
+    
+    const responsePayload = { success: true, data: transaction, message: 'Transaction created successfully' };
+    if (idempotencyKey) {
+      await IdempotencyKey.updateOne({ key: idempotencyKey }, { responseBody: responsePayload, statusCode: 201 });
+    }
+    return res.status(201).json(responsePayload);
   } catch (error) {
     if (session.inTransaction()) {
       await session.abortTransaction();
     }
     session.endSession();
+    
+    // Catch Mongoose transaction conflicts
+    if ((error.hasErrorLabel && error.hasErrorLabel('TransientTransactionError')) || error.code === 112 || error.name === 'WriteConflict') {
+      if (idempotencyKey) await IdempotencyKey.deleteOne({ key: idempotencyKey });
+      return res.status(409).json({ success: false, message: 'This transaction conflicted with another request. Please try again.' });
+    }
+    
     console.error(error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    if (idempotencyKey) await IdempotencyKey.deleteOne({ key: idempotencyKey });
+    return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
