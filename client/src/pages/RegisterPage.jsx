@@ -16,10 +16,11 @@ const RegisterPage = () => {
   const getPasswordStrength = () => {
     if (password.length === 0) return 0;
     let strength = 0;
-    if (password.length > 5) strength += 25;
-    if (password.length > 7) strength += 25;
-    if (/[A-Z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password)) strength += 25;
+    if (password.length > 5) strength += 20;
+    if (password.length > 7) strength += 20;
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[0-9]/.test(password)) strength += 20;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 20;
     return strength;
   };
   const strength = getPasswordStrength();
