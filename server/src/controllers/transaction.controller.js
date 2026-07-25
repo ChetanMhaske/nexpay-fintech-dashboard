@@ -279,13 +279,15 @@ export const reverseTransaction = async (req, res) => {
         { $inc: { balance: -amount } },
         { new: true, session }
       );
-      if (!wallet) throw new Error('Insufficient balance to reverse deposit');
+      if (!wallet) throw new Error('Insufficient balance to reverse deposit or wallet not found');
     } else if (type === 'withdraw') {
-      await Wallet.findOneAndUpdate(
+      if (!fromWallet) throw new Error('fromWallet is missing on this transaction');
+      const wallet = await Wallet.findOneAndUpdate(
         { _id: fromWallet },
         { $inc: { balance: amount } },
         { new: true, session }
       );
+      if (!wallet) throw new Error('Wallet not found for reversal');
     } else if (type === 'transfer') {
       const senderWallet = await Wallet.findOneAndUpdate(
         { _id: fromWallet },
@@ -342,7 +344,7 @@ export const reverseTransaction = async (req, res) => {
       await session.abortTransaction();
     }
     session.endSession();
-    console.error(error);
+    console.error('Reversal Error:', error);
     return res.status(400).json({ success: false, message: error.message || 'Server error during reversal' });
   }
 };
