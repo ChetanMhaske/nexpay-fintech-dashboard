@@ -34,6 +34,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 
+// Health check (no auth required)
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', version: '2026-07-25-v2', timestamp: new Date().toISOString() });
+});
+
 // API Routes
 app.use('/api', (req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
