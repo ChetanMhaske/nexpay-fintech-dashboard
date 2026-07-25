@@ -28,12 +28,10 @@ export const createTransaction = async (req, res) => {
          if (existingKey && existingKey.responseBody) return res.status(existingKey.statusCode).json(existingKey.responseBody);
          return res.status(409).json({ success: false, message: 'Request already in progress. Please try again.' });
       }
-    }
-  }
-
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  let session = null;
   try {
+    session = await mongoose.startSession();
+    session.startTransaction();
     const { type, amount, currency, description, recipientEmail, destinationAddress } = req.body;
     const userId = req.user._id;
 
@@ -193,10 +191,10 @@ export const createTransaction = async (req, res) => {
     }
     return res.status(201).json(responsePayload);
   } catch (error) {
-    if (session.inTransaction()) {
+    if (session && session.inTransaction()) {
       await session.abortTransaction();
     }
-    session.endSession();
+    if (session) session.endSession();
     
     // Catch Mongoose transaction conflicts
     if ((error.hasErrorLabel && error.hasErrorLabel('TransientTransactionError')) || error.code === 112 || error.name === 'WriteConflict') {
@@ -253,9 +251,10 @@ export const getTransactionById = async (req, res) => {
 };
 
 export const reverseTransaction = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  let session = null;
   try {
+    session = await mongoose.startSession();
+    session.startTransaction();
     const txId = req.params.id;
     const transaction = await Transaction.findById(txId).session(session);
 
@@ -340,19 +339,20 @@ export const reverseTransaction = async (req, res) => {
 
     return res.status(200).json({ success: true, data: transaction, message: 'Transaction reversed successfully' });
   } catch (error) {
-    if (session.inTransaction()) {
+    if (session && session.inTransaction()) {
       await session.abortTransaction();
     }
-    session.endSession();
+    if (session) session.endSession();
     console.error('Reversal Error:', error);
     return res.status(400).json({ success: false, message: error.message || 'Server error during reversal' });
   }
 };
 
 export const resolveTransaction = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  let session = null;
   try {
+    session = await mongoose.startSession();
+    session.startTransaction();
     const txId = req.params.id;
     const { action } = req.body; // 'approve' or 'reject'
     
@@ -397,10 +397,10 @@ export const resolveTransaction = async (req, res) => {
 
     return res.status(200).json({ success: true, data: transaction, message: `Transaction ${action}d successfully` });
   } catch (error) {
-    if (session.inTransaction()) {
+    if (session && session.inTransaction()) {
       await session.abortTransaction();
     }
-    session.endSession();
+    if (session) session.endSession();
     console.error(error);
     return res.status(400).json({ success: false, message: error.message || 'Server error during resolution' });
   }
