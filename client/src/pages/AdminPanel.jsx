@@ -59,10 +59,13 @@ const AdminPanel = () => {
   const handleReverse = async (txId) => {
     if (!window.confirm('Are you sure you want to reverse this transaction?')) return;
     try {
+      console.log('Reversing transaction:', txId);
       await transactionService.reverseTransaction(txId);
       setTransactions(transactions.map(tx => (tx._id === txId || tx.id === txId) ? { ...tx, reversed: true } : tx));
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to reverse transaction');
+      console.error('Reverse error:', error.response?.status, error.response?.data);
+      const msg = error.response?.data?.message || `Failed to reverse transaction (HTTP ${error.response?.status || 'unknown'})`;
+      alert(msg);
     }
   };
 
