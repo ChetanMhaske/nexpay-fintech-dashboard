@@ -31,6 +31,13 @@ const AuditView = () => {
     });
   };
 
+  const formatDetails = (details) => {
+    if (!details || typeof details !== 'object') return '-';
+    const entries = Object.entries(details);
+    if (entries.length === 0) return '-';
+    return entries.map(([key, value]) => `${key}: ${value}`).join('  ·  ');
+  };
+
   return (
     <Layout>
       <div className="mb-12 animate-in fade-in duration-500">
@@ -70,8 +77,8 @@ const AuditView = () => {
                     </td>
                     <td className="py-4 px-6 text-dark-300 font-mono text-xs">{log.performedBy?.email || 'System'}</td>
                     <td className="py-4 px-6 text-dark-300 font-mono text-xs">{log.targetUser?.email || '-'}</td>
-                    <td className="py-4 px-6 text-dark-400 max-w-xs truncate" title={JSON.stringify(log.details)}>
-                      {JSON.stringify(log.details)}
+                    <td className="py-4 px-6 text-dark-400 max-w-xs truncate font-mono text-xs" title={formatDetails(log.details)}>
+                      {formatDetails(log.details)}
                     </td>
                     <td className="py-4 px-6 text-dark-400 whitespace-nowrap">
                       {formatDate(log.createdAt)}
@@ -79,7 +86,7 @@ const AuditView = () => {
                   </tr>
                 ))}
                 {logs.length === 0 && (
-                  <tr><td colSpan="5" className="text-center py-8 text-dark-400">No audit logs available.</td></tr>
+                  <tr><td colSpan="5" className="text-center py-16 text-dark-500 text-sm">No audit activity recorded yet.</td></tr>
                 )}
               </tbody>
             </table>

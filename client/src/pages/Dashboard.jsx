@@ -86,7 +86,7 @@ const Dashboard = () => {
     <Layout>
       <div className="mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-500">
         <div>
-          <h1 className="text-2xl font-bold text-white">Welcome back, {user?.name}</h1>
+          <h1 className="text-3xl font-display font-medium text-white tracking-tight">Welcome back, {user?.name}</h1>
           <p className="text-dark-400 text-sm mt-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center gap-2">
@@ -119,15 +119,16 @@ const Dashboard = () => {
           <div className="p-6 flex-1 h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" axisLine={false} tickLine={false} />
-                <YAxis stroke="#94a3b8" axisLine={false} tickLine={false} tickFormatter={(val) => `$${val > 1000 ? (val/1000).toFixed(1) + 'k' : val}`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                <XAxis dataKey="name" stroke="#71717a" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+                <YAxis stroke="#71717a" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} tickFormatter={(val) => `$${val > 1000 ? (val/1000).toFixed(1) + 'k' : val}`} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc', borderRadius: '0.5rem' }} 
-                  itemStyle={{ color: '#3b82f6' }}
+                  contentStyle={{ backgroundColor: '#0A0A0B', borderColor: 'rgba(255,255,255,0.1)', color: '#f4f4f5', borderRadius: '8px', fontSize: '13px' }} 
+                  itemStyle={{ color: '#10b981' }}
+                  labelStyle={{ color: '#a1a1aa', marginBottom: '4px' }}
                   formatter={(value) => [new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value), 'Volume']}
                 />
-                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', strokeWidth: 0, r: 3 }} activeDot={{ r: 5, strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

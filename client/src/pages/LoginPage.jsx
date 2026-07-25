@@ -49,7 +49,7 @@ const LoginPage = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-[#0A0A0B] py-8 px-4 sm:rounded-xl sm:px-10 border border-white/10">
+        <div className="bg-[#0A0A0B] py-8 px-4 sm:rounded-lg sm:px-10 border border-white/10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="p-3 bg-danger-500/10 border border-danger-500/20 text-danger-500 rounded-lg text-sm text-center">

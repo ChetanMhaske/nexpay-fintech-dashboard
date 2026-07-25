@@ -50,7 +50,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-      <div className="bg-[#0A0A0B] border border-white/10 rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#0A0A0B] border border-white/10 rounded-lg w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center p-6 border-b border-white/10">
           <h2 className="text-xl font-display font-medium text-white tracking-tight">New Transaction</h2>
           <button onClick={onClose} className="text-dark-400 hover:text-white transition-colors">

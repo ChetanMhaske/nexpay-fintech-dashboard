@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDownLeft, ArrowUpRight, ArrowRightLeft, RefreshCw, DollarSign } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, ArrowRightLeft, RefreshCw, DollarSign, Inbox } from 'lucide-react';
 
 const TransactionTable = ({ transactions, showUser = false, showActions = false, onReverse }) => {
   const getIcon = (type) => {
@@ -38,8 +38,12 @@ const TransactionTable = ({ transactions, showUser = false, showActions = false,
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="text-center py-8 text-dark-400">
-        No transactions found.
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-10 h-10 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mb-3">
+          <Inbox className="w-4 h-4 text-dark-500" />
+        </div>
+        <p className="text-dark-300 text-sm font-medium">No transactions yet</p>
+        <p className="text-dark-500 text-xs mt-1">Deposits, transfers, and crypto trades will appear here.</p>
       </div>
     );
   }
