@@ -28,6 +28,9 @@ export const createTransaction = async (req, res) => {
          if (existingKey && existingKey.responseBody) return res.status(existingKey.statusCode).json(existingKey.responseBody);
          return res.status(409).json({ success: false, message: 'Request already in progress. Please try again.' });
       }
+    }
+  }
+
   let session = null;
   try {
     session = await mongoose.startSession();
