@@ -50,11 +50,11 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-      <div className="bg-dark-900 border border-dark-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex justify-between items-center p-6 border-b border-dark-800">
-          <h2 className="text-xl font-bold text-white">New Transaction</h2>
+      <div className="bg-[#0A0A0B] border border-white/10 rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="flex justify-between items-center p-6 border-b border-white/10">
+          <h2 className="text-xl font-display font-medium text-white tracking-tight">New Transaction</h2>
           <button onClick={onClose} className="text-dark-400 hover:text-white transition-colors">
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
         
@@ -71,7 +71,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
                 key={tab.id}
                 onClick={() => { setType(tab.id); setError(''); }}
                 className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  type === tab.id ? 'bg-primary-600 text-white' : 'bg-dark-800 text-dark-300 hover:bg-dark-700'
+                  type === tab.id ? 'bg-primary-700 text-white' : 'bg-white/5 text-dark-300 hover:bg-white/10'
                 }`}
               >
                 {tab.label}

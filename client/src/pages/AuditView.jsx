@@ -33,13 +33,13 @@ const AuditView = () => {
 
   return (
     <Layout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Audit Log</h1>
+      <div className="mb-12 animate-in fade-in duration-500">
+        <h1 className="text-3xl font-display font-medium text-white tracking-tight">Audit Log</h1>
         <p className="text-dark-400 text-sm mt-1">System-wide action tracking for compliance and security.</p>
       </div>
 
-      <div className="card p-0 overflow-hidden">
-        <div className="p-6 border-b border-dark-800 flex justify-between items-center">
+      <div className="card p-0 overflow-hidden animate-in fade-in duration-500 delay-100">
+        <div className="p-6 border-b border-white/10 flex justify-between items-center">
           <h3 className="font-semibold text-white flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary-500" />
             Recent Activity
@@ -52,7 +52,7 @@ const AuditView = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-dark-800 text-dark-400 text-sm bg-dark-900/50">
+                <tr className="border-b border-white/10 text-dark-400 text-sm">
                   <th className="pb-3 font-medium px-6 pt-4">Action</th>
                   <th className="pb-3 font-medium px-6 pt-4">Performed By</th>
                   <th className="pb-3 font-medium px-6 pt-4">Target User</th>
@@ -62,14 +62,14 @@ const AuditView = () => {
               </thead>
               <tbody className="text-sm">
                 {logs.map(log => (
-                  <tr key={log._id} className="border-b border-dark-800/50 hover:bg-dark-800/30">
+                  <tr key={log._id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors duration-150 group">
                     <td className="py-4 px-6">
-                      <span className="badge bg-dark-800 text-dark-100 border border-dark-700 font-mono">
+                      <span className="badge bg-white/5 text-dark-300 border border-white/10 font-mono text-xs">
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-dark-300">{log.performedBy?.email || 'System'}</td>
-                    <td className="py-4 px-6 text-dark-300">{log.targetUser?.email || '-'}</td>
+                    <td className="py-4 px-6 text-dark-300 font-mono text-xs">{log.performedBy?.email || 'System'}</td>
+                    <td className="py-4 px-6 text-dark-300 font-mono text-xs">{log.targetUser?.email || '-'}</td>
                     <td className="py-4 px-6 text-dark-400 max-w-xs truncate" title={JSON.stringify(log.details)}>
                       {JSON.stringify(log.details)}
                     </td>

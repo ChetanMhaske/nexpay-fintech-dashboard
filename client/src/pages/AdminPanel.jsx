@@ -58,8 +58,8 @@ const AdminPanel = () => {
 
   return (
     <Layout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
+      <div className="mb-12 animate-in fade-in duration-500">
+        <h1 className="text-3xl font-display font-medium text-white tracking-tight">Admin Panel</h1>
         <p className="text-dark-400 text-sm mt-1">Manage users and oversee global transactions.</p>
       </div>
 
@@ -67,8 +67,8 @@ const AdminPanel = () => {
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       ) : (
         <>
-          <div className="card p-0 overflow-hidden mb-8">
-            <div className="p-6 border-b border-dark-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="card p-0 overflow-hidden mb-12 animate-in fade-in duration-500 delay-100">
+            <div className="p-6 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h3 className="font-semibold text-white">User Management</h3>
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
@@ -84,24 +84,24 @@ const AdminPanel = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-dark-800 text-dark-400 text-sm">
+                  <tr className="border-b border-white/10 text-dark-400 text-sm">
                     <th className="pb-3 font-medium px-6 pt-4">Name</th>
                     <th className="pb-3 font-medium px-6 pt-4">Email</th>
                     <th className="pb-3 font-medium px-6 pt-4">Role</th>
                     <th className="pb-3 font-medium px-6 pt-4">Status</th>
-                    <th className="pb-3 font-medium px-6 pt-4">Actions</th>
+                    <th className="pb-3 font-medium px-6 pt-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {filteredUsers.map(u => (
-                    <tr key={u._id} className="border-b border-dark-800/50 hover:bg-dark-800/30">
+                    <tr key={u._id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors duration-150 group">
                       <td className="py-4 px-6 text-white font-medium">{u.name}</td>
-                      <td className="py-4 px-6 text-dark-300">{u.email}</td>
+                      <td className="py-4 px-6 text-dark-300 font-mono text-xs">{u.email}</td>
                       <td className="py-4 px-6">
                         <select 
                           value={u.role}
                           onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                          className="bg-dark-800 border border-dark-700 text-white rounded px-2 py-1 text-xs focus:ring-primary-500"
+                          className="bg-dark-900 border border-white/10 text-white rounded px-2 py-1 text-xs focus:ring-1 focus:ring-primary-500 outline-none cursor-pointer"
                         >
                           <option value="user">User</option>
                           <option value="auditor">Auditor</option>
@@ -110,15 +110,15 @@ const AdminPanel = () => {
                       </td>
                       <td className="py-4 px-6">
                         {u.isFrozen ? 
-                          <span className="badge bg-danger-500/10 text-danger-500 border border-danger-500/20">Frozen</span> : 
-                          <span className="badge bg-success-500/10 text-success-500 border border-success-500/20">Active</span>
+                          <div className="flex items-center gap-1.5"><span className="text-rose-500 text-[10px]">●</span><span className="text-dark-300">Frozen</span></div> : 
+                          <div className="flex items-center gap-1.5"><span className="text-emerald-500 text-[10px]">●</span><span className="text-dark-300">Active</span></div>
                         }
                       </td>
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-right">
                         <button 
                           onClick={() => handleFreezeToggle(u._id, u.isFrozen)}
-                          className={`text-xs font-medium px-3 py-1 rounded transition-colors ${
-                            u.isFrozen ? 'bg-success-500/10 text-success-500 hover:bg-success-500/20' : 'bg-warning-500/10 text-warning-500 hover:bg-warning-500/20'
+                          className={`text-xs font-medium px-3 py-1 rounded transition-colors border ${
+                            u.isFrozen ? 'border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/10' : 'border-rose-500/20 text-rose-500 hover:bg-rose-500/10'
                           }`}
                         >
                           {u.isFrozen ? 'Unfreeze' : 'Freeze'}
@@ -134,8 +134,8 @@ const AdminPanel = () => {
             </div>
           </div>
 
-          <div className="card p-0 overflow-hidden">
-            <div className="p-6 border-b border-dark-800">
+          <div className="card p-0 overflow-hidden animate-in fade-in duration-500 delay-200">
+            <div className="p-6 border-b border-white/10">
               <h3 className="font-semibold text-white">Global Transactions</h3>
             </div>
             <TransactionTable transactions={transactions} showUser={true} />

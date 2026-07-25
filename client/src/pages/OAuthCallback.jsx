@@ -29,7 +29,7 @@ const OAuthCallback = () => {
   }, [location, handleOAuthToken, navigate]);
 
   return (
-    <div className="min-h-screen bg-dark-950 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#0A0A0B] flex flex-col items-center justify-center">
       <Spinner size="lg" />
       <p className="mt-4 text-dark-300">Completing sign in...</p>
     </div>

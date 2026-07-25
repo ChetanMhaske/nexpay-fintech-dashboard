@@ -84,7 +84,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-500">
         <div>
           <h1 className="text-2xl font-bold text-white">Welcome back, {user?.name}</h1>
           <p className="text-dark-400 text-sm mt-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
@@ -96,7 +96,7 @@ const Dashboard = () => {
       </div>
 
       {/* Wallets */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 animate-in fade-in duration-500 delay-100">
         {['USD', 'BTC', 'ETH'].map(currency => {
           const wallet = wallets.find(w => w.currency === currency) || { balance: 0 };
           return (
@@ -111,9 +111,9 @@ const Dashboard = () => {
       </div>
 
       {/* Stats & Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 animate-in fade-in duration-500 delay-200">
         <div className="lg:col-span-2 card p-0 overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-dark-800 flex justify-between items-center">
+          <div className="p-6 border-b border-white/10 flex justify-between items-center">
             <h3 className="font-semibold text-white">Activity Overview</h3>
           </div>
           <div className="p-6 flex-1 h-[300px]">
@@ -133,7 +133,7 @@ const Dashboard = () => {
           </div>
         </div>
         
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           <StatCard icon={Activity} label="Total Transactions" value={transactions.length} />
           <StatCard icon={PieChart} label="Total Volume (USD)" value={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalVolume)} />
           <StatCard icon={CreditCard} label="Pending Operations" value={pendingCount} />
@@ -141,8 +141,8 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Transactions */}
-      <div className="card p-0 overflow-hidden">
-        <div className="p-6 border-b border-dark-800 flex justify-between items-center">
+      <div className="card p-0 overflow-hidden animate-in fade-in duration-500 delay-300">
+        <div className="p-6 border-b border-white/10 flex justify-between items-center">
           <h3 className="font-semibold text-white">Recent Transactions</h3>
         </div>
         <TransactionTable transactions={transactions.slice(0, 10)} />
