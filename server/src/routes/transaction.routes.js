@@ -1,5 +1,5 @@
 import express from 'express';
-import { createTransaction, getMyTransactions, getTransactionById, reverseTransaction } from '../controllers/transaction.controller.js';
+import { createTransaction, getMyTransactions, getTransactionById, reverseTransaction, resolveTransaction } from '../controllers/transaction.controller.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { createTransactionSchema } from '../validators/transaction.validators.js';
@@ -14,5 +14,6 @@ router.post('/', validate(createTransactionSchema), createTransaction);
 router.get('/', getMyTransactions);
 router.get('/:id', getTransactionById);
 router.post('/:id/reverse', authorize('admin'), reverseTransaction);
+router.post('/:id/resolve', authorize('admin'), resolveTransaction);
 
 export default router;

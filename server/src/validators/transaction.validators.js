@@ -5,7 +5,8 @@ export const createTransactionSchema = z.object({
   amount: z.number().positive('Amount must be positive').min(0.00000001, 'Minimum amount is 0.00000001'),
   currency: z.enum(['USD', 'BTC', 'ETH']),
   description: z.string().optional(),
-  recipientEmail: z.string().email('Invalid recipient email').optional()
+  recipientEmail: z.string().email('Invalid recipient email').optional(),
+  destinationAddress: z.string().optional()
 }).refine(data => {
   if (data.type === 'transfer' && !data.recipientEmail) {
     return false;

@@ -34,7 +34,7 @@ export const createTransaction = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { type, amount, currency, description, recipientEmail } = req.body;
+    const { type, amount, currency, description, recipientEmail, destinationAddress } = req.body;
     const userId = req.user._id;
 
     let transaction;
@@ -75,10 +75,10 @@ export const createTransaction = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Insufficient balance' });
       }
       transaction = await Transaction.create([{
-        user: userId, type, amount, currency, status: 'complete', fromWallet: userWallet._id, description
+        user: userId, type, amount, currency, status: destinationAddress ? 'pending' : 'complete', fromWallet: userWallet._id, description, metadata: destinationAddress ? { destinationAddress } : undefined
       }], { session });
       transaction = transaction[0];
-      await createAuditLog('transaction.withdraw', userId, { amount, currency }, req.ip, null, transaction._id);
+      await createAuditLog('transaction.withdraw', userId, { amount, currency, destinationAddress }, req.ip, null, transaction._id);
     } 
     else if (type === 'transfer') {
       const recipient = await User.findOne({ email: recipientEmail }).session(session);
@@ -344,5 +344,62 @@ export const reverseTransaction = async (req, res) => {
     session.endSession();
     console.error(error);
     return res.status(400).json({ success: false, message: error.message || 'Server error during reversal' });
+  }
+};
+
+export const resolveTransaction = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const txId = req.params.id;
+    const { action } = req.body; // 'approve' or 'reject'
+    
+    if (action !== 'approve' && action !== 'reject') {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ success: false, message: 'Invalid action. Must be approve or reject' });
+    }
+
+    const transaction = await Transaction.findById(txId).session(session);
+
+    if (!transaction) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'pending') {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ success: false, message: 'Transaction is not pending' });
+    }
+
+    if (action === 'approve') {
+      transaction.status = 'complete';
+    } else if (action === 'reject') {
+      transaction.status = 'failed';
+      if (transaction.type === 'withdraw' && transaction.fromWallet) {
+        await Wallet.findOneAndUpdate(
+          { _id: transaction.fromWallet },
+          { $inc: { balance: transaction.amount } },
+          { new: true, session }
+        );
+      }
+    }
+
+    await transaction.save({ session });
+    await createAuditLog(`transaction.resolve_${action}`, req.user._id, { originalTxId: txId, type: transaction.type, amount: transaction.amount, currency: transaction.currency }, req.ip, transaction.user, txId);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({ success: true, data: transaction, message: `Transaction ${action}d successfully` });
+  } catch (error) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    session.endSession();
+    console.error(error);
+    return res.status(400).json({ success: false, message: error.message || 'Server error during resolution' });
   }
 };

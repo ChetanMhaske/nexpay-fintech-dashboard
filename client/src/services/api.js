@@ -86,6 +86,7 @@ export const transactionService = {
   getTransactions: (params) => api.get('/transactions', { params }).then(res => res.data),
   getTransaction: (id) => api.get(`/transactions/${id}`).then(res => res.data),
   reverseTransaction: (id) => api.post(`/transactions/${id}/reverse`).then(res => res.data),
+  resolveTransaction: (id, action) => api.post(`/transactions/${id}/resolve`, { action }).then(res => res.data),
 };
 
 export const userService = {

@@ -8,6 +8,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USD');
   const [recipientEmail, setRecipientEmail] = useState('');
+  const [destinationAddress, setDestinationAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,6 +24,9 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
       if (type === 'transfer') {
         payload.recipientEmail = recipientEmail;
       }
+      if (type === 'withdraw' && destinationAddress.trim() !== '') {
+        payload.destinationAddress = destinationAddress;
+      }
       
       const idempotencyKey = crypto.randomUUID();
       await transactionService.createTransaction(payload, { 
@@ -33,6 +37,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
       // Reset form
       setAmount('');
       setRecipientEmail('');
+      setDestinationAddress('');
     } catch (err) {
       setError(err.response?.data?.message || 'Transaction failed');
     } finally {
@@ -128,6 +133,19 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
                   onChange={(e) => setRecipientEmail(e.target.value)}
                   className="input-field"
                   placeholder="user@example.com"
+                />
+              </div>
+            )}
+
+            {type === 'withdraw' && (
+              <div>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Destination Address / Bank Account (Optional)</label>
+                <input
+                  type="text"
+                  value={destinationAddress}
+                  onChange={(e) => setDestinationAddress(e.target.value)}
+                  className="input-field"
+                  placeholder="e.g. bc1qxy2kgdygjrsqtzq2n0yrf249..."
                 />
               </div>
             )}

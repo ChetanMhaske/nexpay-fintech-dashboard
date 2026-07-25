@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowDownLeft, ArrowUpRight, ArrowRightLeft, RefreshCw, DollarSign, Inbox } from 'lucide-react';
 
-const TransactionTable = ({ transactions, showUser = false, showActions = false, onReverse }) => {
+const TransactionTable = ({ transactions, showUser = false, showActions = false, onReverse, onResolve }) => {
   const getIcon = (type) => {
     switch (type) {
       case 'deposit': return <ArrowDownLeft className="w-4 h-4 text-success-500" />;
@@ -88,10 +88,31 @@ const TransactionTable = ({ transactions, showUser = false, showActions = false,
                 {formatDate(tx.createdAt)}
               </td>
               <td className="py-4 px-4 text-dark-400 max-w-xs truncate" title={tx.description}>
-                {tx.description || '-'}
+                <div>{tx.description || '-'}</div>
+                {tx.metadata?.destinationAddress && (
+                  <div className="text-xs text-dark-500 font-mono mt-1" title={tx.metadata.destinationAddress}>
+                    To: {tx.metadata.destinationAddress.slice(0, 16)}...
+                  </div>
+                )}
               </td>
               {showActions && (
-                <td className="py-4 px-4 text-right">
+                <td className="py-4 px-4 text-right space-x-2">
+                  {tx.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => onResolve && onResolve(tx._id || tx.id, 'approve')}
+                        className="text-xs font-medium px-3 py-1 rounded transition-colors border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/10"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => onResolve && onResolve(tx._id || tx.id, 'reject')}
+                        className="text-xs font-medium px-3 py-1 rounded transition-colors border border-rose-500/20 text-rose-500 hover:bg-rose-500/10"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
                   {!tx.reversed && (tx.status === 'complete' || tx.status === 'completed') && (
                     <button
                       onClick={() => onReverse && onReverse(tx._id || tx.id)}

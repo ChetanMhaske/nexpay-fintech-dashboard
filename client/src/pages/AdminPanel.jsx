@@ -66,6 +66,16 @@ const AdminPanel = () => {
     }
   };
 
+  const handleResolve = async (txId, action) => {
+    if (!window.confirm(`Are you sure you want to ${action} this transaction?`)) return;
+    try {
+      await transactionService.resolveTransaction(txId, action);
+      setTransactions(transactions.map(tx => (tx._id === txId || tx.id === txId) ? { ...tx, status: action === 'approve' ? 'complete' : 'failed' } : tx));
+    } catch (error) {
+      alert(error.response?.data?.message || `Failed to ${action} transaction`);
+    }
+  };
+
   return (
     <Layout>
       <div className="mb-12 animate-in fade-in duration-500">
@@ -148,7 +158,7 @@ const AdminPanel = () => {
             <div className="p-6 border-b border-white/10">
               <h3 className="font-semibold text-white">Global Transactions</h3>
             </div>
-            <TransactionTable transactions={transactions} showUser={true} showActions={true} onReverse={handleReverse} />
+            <TransactionTable transactions={transactions} showUser={true} showActions={true} onReverse={handleReverse} onResolve={handleResolve} />
           </div>
         </>
       )}
