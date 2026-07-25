@@ -15,7 +15,7 @@ const AdminPanel = () => {
     try {
       setLoading(true);
       const [usersRes, txRes] = await Promise.all([
-        userService.getUsers().catch(() => ({ data: { users: [] } })),
+        userService.getUsers({ limit: 500 }).catch(() => ({ data: { users: [] } })),
         userService.getAllTransactions({ limit: 10 }).catch(() => ({ data: { transactions: [] } }))
       ]);
       const usersData = usersRes.data || usersRes || {};
