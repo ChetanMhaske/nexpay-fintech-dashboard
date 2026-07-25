@@ -18,7 +18,7 @@ export const getAllUsers = async (req, res) => {
       ];
     }
 
-    const users = await User.find(query).select('-password').skip(skip).limit(limit);
+    const users = await User.find(query).select('-password').sort({ createdAt: -1 }).skip(skip).limit(limit);
     const total = await User.countDocuments(query);
     const pages = Math.ceil(total / limit);
 
