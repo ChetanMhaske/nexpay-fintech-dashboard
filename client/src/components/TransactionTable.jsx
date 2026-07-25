@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowDownLeft, ArrowUpRight, ArrowRightLeft, RefreshCw, DollarSign } from 'lucide-react';
 
-const TransactionTable = ({ transactions, showUser = false }) => {
+const TransactionTable = ({ transactions, showUser = false, showActions = false, onReverse }) => {
   const getIcon = (type) => {
     switch (type) {
       case 'deposit': return <ArrowDownLeft className="w-4 h-4 text-success-500" />;
@@ -13,13 +13,16 @@ const TransactionTable = ({ transactions, showUser = false }) => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
+  const getStatusBadge = (tx) => {
+    if (tx.reversed) {
+      return <div className="flex items-center gap-1.5"><span className="text-dark-500 text-[10px]">●</span><span className="text-dark-400 line-through">Reversed</span></div>;
+    }
+    switch (tx.status) {
       case 'completed': 
       case 'complete': return <div className="flex items-center gap-1.5"><span className="text-emerald-500 text-[10px]">●</span><span className="text-dark-300">Completed</span></div>;
       case 'pending': return <div className="flex items-center gap-1.5"><span className="text-amber-500 text-[10px]">●</span><span className="text-dark-300">Pending</span></div>;
       case 'failed': return <div className="flex items-center gap-1.5"><span className="text-rose-500 text-[10px]">●</span><span className="text-dark-300">Failed</span></div>;
-      default: return <div className="flex items-center gap-1.5"><span className="text-dark-500 text-[10px]">●</span><span className="text-dark-300 capitalize">{status}</span></div>;
+      default: return <div className="flex items-center gap-1.5"><span className="text-dark-500 text-[10px]">●</span><span className="text-dark-300 capitalize">{tx.status}</span></div>;
     }
   };
 
@@ -52,6 +55,7 @@ const TransactionTable = ({ transactions, showUser = false }) => {
             <th className="pb-3 font-medium px-4">Status</th>
             <th className="pb-3 font-medium px-4">Date</th>
             <th className="pb-3 font-medium px-4">Description</th>
+            {showActions && <th className="pb-3 font-medium px-4 text-right">Actions</th>}
           </tr>
         </thead>
         <tbody className="text-sm">
@@ -74,7 +78,7 @@ const TransactionTable = ({ transactions, showUser = false }) => {
                 {tx.type === 'withdraw' || tx.type === 'crypto_buy' ? '-' : '+'}{tx.amount} {tx.currency}
               </td>
               <td className="py-4 px-4">
-                {getStatusBadge(tx.status)}
+                {getStatusBadge(tx)}
               </td>
               <td className="py-4 px-4 text-dark-400">
                 {formatDate(tx.createdAt)}
@@ -82,6 +86,18 @@ const TransactionTable = ({ transactions, showUser = false }) => {
               <td className="py-4 px-4 text-dark-400 max-w-xs truncate" title={tx.description}>
                 {tx.description || '-'}
               </td>
+              {showActions && (
+                <td className="py-4 px-4 text-right">
+                  {!tx.reversed && (tx.status === 'complete' || tx.status === 'completed') && (
+                    <button
+                      onClick={() => onReverse && onReverse(tx._id || tx.id)}
+                      className="text-xs font-medium px-3 py-1 rounded transition-colors border border-white/10 text-dark-300 hover:bg-white/5 hover:text-white"
+                    >
+                      Reverse
+                    </button>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { userService } from '../services/api';
+import { userService, transactionService } from '../services/api';
 import Spinner from '../components/Spinner';
 import TransactionTable from '../components/TransactionTable';
 import { Search } from 'lucide-react';
@@ -55,6 +55,16 @@ const AdminPanel = () => {
     u.email.toLowerCase().includes(search.toLowerCase()) || 
     u.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleReverse = async (txId) => {
+    if (!window.confirm('Are you sure you want to reverse this transaction?')) return;
+    try {
+      await transactionService.reverseTransaction(txId);
+      setTransactions(transactions.map(tx => (tx._id === txId || tx.id === txId) ? { ...tx, reversed: true } : tx));
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to reverse transaction');
+    }
+  };
 
   return (
     <Layout>
@@ -138,7 +148,7 @@ const AdminPanel = () => {
             <div className="p-6 border-b border-white/10">
               <h3 className="font-semibold text-white">Global Transactions</h3>
             </div>
-            <TransactionTable transactions={transactions} showUser={true} />
+            <TransactionTable transactions={transactions} showUser={true} showActions={true} onReverse={handleReverse} />
           </div>
         </>
       )}

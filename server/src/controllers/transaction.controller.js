@@ -251,3 +251,98 @@ export const getTransactionById = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+export const reverseTransaction = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const txId = req.params.id;
+    const transaction = await Transaction.findById(txId).session(session);
+
+    if (!transaction) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.reversed) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ success: false, message: 'Transaction is already reversed' });
+    }
+
+    const { type, amount, currency, user: userId, fromWallet, toWallet, metadata } = transaction;
+
+    if (type === 'deposit') {
+      const wallet = await Wallet.findOneAndUpdate(
+        { _id: toWallet, balance: { $gte: amount } },
+        { $inc: { balance: -amount } },
+        { new: true, session }
+      );
+      if (!wallet) throw new Error('Insufficient balance to reverse deposit');
+    } else if (type === 'withdraw') {
+      await Wallet.findOneAndUpdate(
+        { _id: fromWallet },
+        { $inc: { balance: amount } },
+        { new: true, session }
+      );
+    } else if (type === 'transfer') {
+      const senderWallet = await Wallet.findOneAndUpdate(
+        { _id: fromWallet },
+        { $inc: { balance: amount } },
+        { new: true, session }
+      );
+      const recipientWallet = await Wallet.findOneAndUpdate(
+        { _id: toWallet, balance: { $gte: amount } },
+        { $inc: { balance: -amount } },
+        { new: true, session }
+      );
+      if (!recipientWallet) throw new Error('Insufficient balance in recipient wallet to reverse transfer');
+    } else if (type === 'crypto_buy') {
+      const { costInUSD } = metadata;
+      const cryptoWallet = await Wallet.findOneAndUpdate(
+        { _id: toWallet, balance: { $gte: amount } },
+        { $inc: { balance: -amount } },
+        { new: true, session }
+      );
+      if (!cryptoWallet) throw new Error('Insufficient crypto balance to reverse buy');
+      
+      await Wallet.findOneAndUpdate(
+        { _id: fromWallet },
+        { $inc: { balance: costInUSD } },
+        { new: true, session }
+      );
+    } else if (type === 'crypto_sell') {
+      const { gainInUSD } = metadata;
+      const usdWallet = await Wallet.findOneAndUpdate(
+        { _id: toWallet, balance: { $gte: gainInUSD } },
+        { $inc: { balance: -gainInUSD } },
+        { new: true, session }
+      );
+      if (!usdWallet) throw new Error('Insufficient USD balance to reverse sell');
+      
+      await Wallet.findOneAndUpdate(
+        { _id: fromWallet },
+        { $inc: { balance: amount } },
+        { new: true, session }
+      );
+    }
+
+    transaction.reversed = true;
+    await transaction.save({ session });
+
+    await createAuditLog('transaction.reverse', req.user._id, { originalTxId: txId, type, amount, currency }, req.ip, userId, txId);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({ success: true, data: transaction, message: 'Transaction reversed successfully' });
+  } catch (error) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    session.endSession();
+    console.error(error);
+    return res.status(400).json({ success: false, message: error.message || 'Server error during reversal' });
+  }
+};

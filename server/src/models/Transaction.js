@@ -10,7 +10,8 @@ const transactionSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'complete', 'failed'], default: 'pending' },
   description: { type: String },
   recipientEmail: { type: String },
-  metadata: { type: mongoose.Schema.Types.Mixed }
+  metadata: { type: mongoose.Schema.Types.Mixed },
+  reversed: { type: Boolean, default: false }
 }, { timestamps: true });
 
 transactionSchema.index({ user: 1, createdAt: 1 });
