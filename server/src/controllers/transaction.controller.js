@@ -75,7 +75,7 @@ export const createTransaction = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Insufficient balance' });
       }
       transaction = await Transaction.create([{
-        user: userId, type, amount, currency, status: destinationAddress ? 'pending' : 'complete', fromWallet: userWallet._id, description, metadata: destinationAddress ? { destinationAddress } : undefined
+        user: userId, type, amount, currency, status: 'pending', fromWallet: userWallet._id, description, metadata: destinationAddress ? { destinationAddress } : undefined
       }], { session });
       transaction = transaction[0];
       await createAuditLog('transaction.withdraw', userId, { amount, currency, destinationAddress }, req.ip, null, transaction._id);

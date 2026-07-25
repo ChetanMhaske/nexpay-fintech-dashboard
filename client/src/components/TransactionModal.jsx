@@ -139,9 +139,10 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
 
             {type === 'withdraw' && (
               <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1">Destination Address / Bank Account (Optional)</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Destination Address / Bank Account</label>
                 <input
                   type="text"
+                  required
                   value={destinationAddress}
                   onChange={(e) => setDestinationAddress(e.target.value)}
                   className="input-field"
@@ -152,7 +153,7 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
 
             <button 
               type="submit" 
-              disabled={loading || !amount || (type === 'transfer' && !recipientEmail)}
+              disabled={loading || !amount || (type === 'transfer' && !recipientEmail) || (type === 'withdraw' && !destinationAddress)}
               className="btn-primary w-full mt-6 flex justify-center items-center"
             >
               {loading ? <Spinner size="sm" /> : 'Submit Transaction'}
