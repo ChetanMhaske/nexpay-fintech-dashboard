@@ -74,7 +74,15 @@ const TransactionModal = ({ isOpen, onClose, onSuccess }) => {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => { setType(tab.id); setError(''); }}
+                onClick={() => { 
+                  setType(tab.id); 
+                  setError(''); 
+                  if ((tab.id === 'crypto_buy' || tab.id === 'crypto_sell') && currency === 'USD') {
+                    setCurrency('BTC');
+                  } else if (tab.id === 'transfer' && currency !== 'USD') {
+                    setCurrency('USD');
+                  }
+                }}
                 className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   type === tab.id ? 'bg-primary-700 text-white' : 'bg-white/5 text-dark-300 hover:bg-white/10'
                 }`}

@@ -15,4 +15,12 @@ export const createTransactionSchema = z.object({
 }, {
   message: "Recipient email is required for transfers",
   path: ["recipientEmail"]
+}).refine(data => {
+  if ((data.type === 'crypto_buy' || data.type === 'crypto_sell') && data.currency === 'USD') {
+    return false;
+  }
+  return true;
+}, {
+  message: "Currency must be BTC or ETH for crypto transactions",
+  path: ["currency"]
 });
