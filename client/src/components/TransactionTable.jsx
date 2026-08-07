@@ -49,17 +49,17 @@ const TransactionTable = ({ transactions, showUser = false, showActions = false,
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto relative">
       <table className="w-full text-left border-collapse">
-        <thead>
+        <thead className="sticky top-0 bg-[#0A0A0B] z-10 shadow-sm">
           <tr className="border-b border-white/10 text-dark-400 text-sm">
-            <th className="pb-3 font-medium px-4">Type</th>
-            {showUser && <th className="pb-3 font-medium px-4">User</th>}
-            <th className="pb-3 font-medium px-4 text-right">Amount</th>
-            <th className="pb-3 font-medium px-4">Status</th>
-            <th className="pb-3 font-medium px-4">Date</th>
-            <th className="pb-3 font-medium px-4">Description</th>
-            {showActions && <th className="pb-3 font-medium px-4 text-right">Actions</th>}
+            <th className="pb-3 font-medium px-4 pt-4">Type</th>
+            {showUser && <th className="pb-3 font-medium px-4 pt-4">User</th>}
+            <th className="pb-3 font-medium px-4 pt-4 text-right">Amount</th>
+            <th className="pb-3 font-medium px-4 pt-4">Status</th>
+            <th className="pb-3 font-medium px-4 pt-4">Date</th>
+            <th className="pb-3 font-medium px-4 pt-4">Description</th>
+            {showActions && <th className="pb-3 font-medium px-4 pt-4 text-right">Actions</th>}
           </tr>
         </thead>
         <tbody className="text-sm">

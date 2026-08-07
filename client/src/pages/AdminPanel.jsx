@@ -16,7 +16,7 @@ const AdminPanel = () => {
       setLoading(true);
       const [usersRes, txRes] = await Promise.all([
         userService.getUsers({ limit: 500 }).catch(() => ({ data: { users: [] } })),
-        userService.getAllTransactions({ limit: 10 }).catch(() => ({ data: { transactions: [] } }))
+        userService.getAllTransactions({ limit: 1000 }).catch(() => ({ data: { transactions: [] } }))
       ]);
       const usersData = usersRes.data || usersRes || {};
       const txData = txRes.data || txRes || {};
@@ -104,9 +104,9 @@ const AdminPanel = () => {
                 />
               </div>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto max-h-[500px]">
               <table className="w-full text-left border-collapse">
-                <thead>
+                <thead className="sticky top-0 bg-[#0A0A0B] z-10 shadow-sm">
                   <tr className="border-b border-white/10 text-dark-400 text-sm">
                     <th className="pb-3 font-medium px-6 pt-4">Name</th>
                     <th className="pb-3 font-medium px-6 pt-4">Email</th>
@@ -161,7 +161,9 @@ const AdminPanel = () => {
             <div className="p-6 border-b border-white/10">
               <h3 className="font-semibold text-white">Global Transactions</h3>
             </div>
-            <TransactionTable transactions={transactions} showUser={true} showActions={true} onReverse={handleReverse} onResolve={handleResolve} />
+            <div className="overflow-y-auto max-h-[500px]">
+              <TransactionTable transactions={transactions} showUser={true} showActions={true} onReverse={handleReverse} onResolve={handleResolve} />
+            </div>
           </div>
         </>
       )}
