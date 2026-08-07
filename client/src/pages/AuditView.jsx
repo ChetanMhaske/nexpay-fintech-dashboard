@@ -13,7 +13,7 @@ const AuditView = () => {
       try {
         setLoading(true);
         // Fallback to empty if api fails for dummy data setup
-        const response = await auditService.getAuditLogs().catch(() => ({ data: { logs: [] } }));
+        const response = await auditService.getAuditLogs({ limit: 1000 }).catch(() => ({ data: { logs: [] } }));
         const logsData = response.data || response || {};
         setLogs(logsData.logs || []);
       } catch (error) {
@@ -56,9 +56,9 @@ const AuditView = () => {
         {loading ? (
           <div className="flex justify-center py-12"><Spinner /></div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto max-h-[500px]">
             <table className="w-full text-left border-collapse">
-              <thead>
+              <thead className="sticky top-0 bg-[#0A0A0B] z-10 shadow-sm">
                 <tr className="border-b border-white/10 text-dark-400 text-sm">
                   <th className="pb-3 font-medium px-6 pt-4">Action</th>
                   <th className="pb-3 font-medium px-6 pt-4">Performed By</th>
