@@ -74,7 +74,7 @@ const Layout = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen bg-dark-950 flex">
+    <div className="h-screen overflow-hidden bg-dark-950 flex">
       {/* Mobile sidebar backdrop */}
       {mobileMenuOpen && (
         <div 
