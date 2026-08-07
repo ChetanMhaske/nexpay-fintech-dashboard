@@ -217,7 +217,13 @@ export const getMyTransactions = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const query = { user: req.user._id };
+    const baseQuery = {
+      $or: [
+        { user: req.user._id },
+        { recipientEmail: req.user.email }
+      ]
+    };
+    const query = { ...baseQuery };
     if (req.query.type) query.type = req.query.type;
     if (req.query.status) query.status = req.query.status;
     if (req.query.startDate && req.query.endDate) {
@@ -228,6 +234,7 @@ export const getMyTransactions = async (req, res) => {
     }
 
     const transactions = await Transaction.find(query)
+      .populate('user', 'name email')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

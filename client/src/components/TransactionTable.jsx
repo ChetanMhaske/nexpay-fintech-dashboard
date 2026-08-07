@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowDownLeft, ArrowUpRight, ArrowRightLeft, RefreshCw, DollarSign, Inbox } from 'lucide-react';
 
-const TransactionTable = ({ transactions, showUser = false, showActions = false, onReverse, onResolve }) => {
+const TransactionTable = ({ transactions, showUser = false, showActions = false, onReverse, onResolve, currentUser = null }) => {
   const getIcon = (type) => {
     switch (type) {
       case 'deposit': return <ArrowDownLeft className="w-4 h-4 text-success-500" />;
@@ -75,11 +75,20 @@ const TransactionTable = ({ transactions, showUser = false, showActions = false,
               </td>
               {showUser && (
                 <td className="py-4 px-4 text-dark-300">
-                  {tx.userId?.email || 'N/A'}
+                  {tx.user?.email || 'N/A'}
                 </td>
               )}
               <td className="py-4 px-4 font-mono font-medium text-dark-100 text-right tabular-nums tracking-tight">
-                {tx.type === 'withdraw' || tx.type === 'crypto_buy' ? '-' : '+'}{tx.amount} {tx.currency}
+                {(() => {
+                  let prefix = '';
+                  if (tx.type === 'deposit' || tx.type === 'crypto_sell') prefix = '+';
+                  else if (tx.type === 'withdraw' || tx.type === 'crypto_buy') prefix = '-';
+                  else if (tx.type === 'transfer') {
+                    if (currentUser && (tx.user?._id === currentUser._id || tx.user === currentUser._id)) prefix = '-';
+                    else prefix = '+';
+                  }
+                  return prefix;
+                })()}{tx.amount} {tx.currency}
               </td>
               <td className="py-4 px-4">
                 {getStatusBadge(tx)}
@@ -92,6 +101,16 @@ const TransactionTable = ({ transactions, showUser = false, showActions = false,
                 {tx.metadata?.destinationAddress && (
                   <div className="text-xs text-dark-500 font-mono mt-1" title={tx.metadata.destinationAddress}>
                     To: {tx.metadata.destinationAddress.slice(0, 16)}...
+                  </div>
+                )}
+                {tx.type === 'transfer' && currentUser && (tx.user?._id === currentUser._id || tx.user === currentUser._id) && (
+                  <div className="text-xs text-dark-500 font-mono mt-1" title={tx.recipientEmail}>
+                    To: {tx.recipientEmail}
+                  </div>
+                )}
+                {tx.type === 'transfer' && currentUser && (tx.user?._id !== currentUser._id && tx.user !== currentUser._id) && (
+                  <div className="text-xs text-emerald-500/70 font-mono mt-1" title={tx.user?.email}>
+                    From: {tx.user?.email}
                   </div>
                 )}
               </td>

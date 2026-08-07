@@ -146,7 +146,9 @@ const Dashboard = () => {
         <div className="p-6 border-b border-white/10 flex justify-between items-center">
           <h3 className="font-semibold text-white">Recent Transactions</h3>
         </div>
-        <TransactionTable transactions={transactions.slice(0, 10)} />
+        <div className="overflow-y-auto max-h-[500px]">
+          <TransactionTable transactions={transactions} currentUser={user} />
+        </div>
       </div>
 
       <TransactionModal 
